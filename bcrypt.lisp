@@ -5,10 +5,11 @@
 
 (in-package :bcrypt)
 
-(define-foreign-library libbcrypt
-  (:darwin "libbcrypt.dylib")
-  (:unix (:or "libbcrypt.so.1.0.4" "libbcrypt.so.1" "libbcrypt.so"))
-  (t (:default "libbcrypt")))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-foreign-library libbcrypt
+    (:darwin "libbcrypt.dylib")
+    (:unix (:or "libbcrypt.so.1.0.4" "libbcrypt.so.1" "libbcrypt.so"))
+    (t (:default "libbcrypt"))))
 
 (use-foreign-library libbcrypt)
 
@@ -35,7 +36,7 @@
   random number generator.")
 
 (defparameter *default-cost* 10
-  "The default value for the COST parameter to HASH.") 
+  "The default value for the COST parameter to HASH.")
 
 (defun hash (password &optional cost)
   "Encode the given plaintext PASSWORD with the given COST (defaults
@@ -106,7 +107,7 @@ built-in random number generator."
   "Generate N random bytes by reading from /dev/urandom. Returns NIL
 if /dev/urandom doesn't exist or an error occurs."
   (when (probe-file "/dev/urandom")
-    (ignore-errors 
+    (ignore-errors
       (with-open-file (r "/dev/urandom" :element-type '(unsigned-byte 8))
         (let ((bytes (make-array n :element-type '(unsigned-byte 8))))
           (read-sequence bytes r)
